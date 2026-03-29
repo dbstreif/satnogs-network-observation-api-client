@@ -67,6 +67,10 @@ The client automatically retries once on 429 (Too Many Requests), respecting the
 
 See [API.md](API.md) for complete documentation of all wrapper functions with usage examples.
 
+## Usage Guide
+
+See [GUIDE.md](GUIDE.md) for solutions to common problems like filtering observations by satellite class (amateur, cubesat, weather, etc.) using the SatNOGS DB API alongside this wrapper.
+
 ## AI Transparency
 
 This project was built with the assistance of Claude (Anthropic). AI was used for code generation, documentation, and test authoring. All AI-assisted commits are tagged with a `Co-Authored-By` trailer in the commit message. A human reviewed and directed all changes.
