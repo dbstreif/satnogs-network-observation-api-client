@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "satnogs-network-api"
+version = "0.1.0"
+description = "Python client wrapper for the SatNOGS Network Observation API"
+readme = "README.md"
+license = "AGPL-3.0-only"
+requires-python = ">=3.9"
+authors = [
+    {name = "Dominic"},
+]
+dependencies = [
+    "requests>=2.25.0",
+    "pydantic>=1.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "wheel",
+    "pytest>=7.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["satnogs_network_api*"]
