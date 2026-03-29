@@ -23,10 +23,11 @@ pip install .
 ### Using Make
 
 ```bash
-make venv          # Create .venv, install deps
-make wheel         # Build a wheel (creates venv if needed)
-make test          # Run unit tests
-make clean         # Remove build artifacts
+make venv               # Create .venv, install deps
+make wheel              # Build a wheel (creates venv if needed)
+make test               # Run unit tests (mocked, no network)
+make test-integration   # Run integration tests (hits live API)
+make clean              # Remove build artifacts
 ```
 
 ### For development

@@ -3,7 +3,7 @@ PYTHON = $(VENV)/bin/python
 PIP = $(VENV)/bin/pip
 PROMPT = snoa
 
-.PHONY: wheel clean venv test
+.PHONY: wheel clean venv test test-unit test-integration
 
 venv: $(VENV)/bin/activate
 
@@ -15,8 +15,13 @@ $(VENV)/bin/activate:
 wheel: venv
 	$(PYTHON) -m build --wheel
 
-test: venv
-	$(PYTHON) -m pytest tests/ -v
+test: test-unit
+
+test-unit: venv
+	$(PYTHON) -m pytest tests/ -v --ignore=tests/test_integration.py
+
+test-integration: venv
+	$(PYTHON) -m pytest tests/test_integration.py -v
 
 clean:
 	rm -rf dist/ build/ *.egg-info satnogs_network_api/*.egg-info
