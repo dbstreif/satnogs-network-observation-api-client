@@ -2,12 +2,12 @@
 
 from satnogs_network_api.client import SatnogsNetworkClient
 from satnogs_network_api.models import (
-    Antenna,
+    AntennaEntry,
     DemodData,
-    FrequencyRange,
     Observation,
     Station,
     Transmitter,
+    TransmitterStats,
 )
 from satnogs_network_api.pagination import PageIterator
 
@@ -15,11 +15,11 @@ __version__ = "0.1.0"
 
 __all__ = [
     "SatnogsNetworkClient",
-    "Antenna",
+    "AntennaEntry",
     "DemodData",
-    "FrequencyRange",
     "Observation",
     "PageIterator",
     "Station",
     "Transmitter",
+    "TransmitterStats",
 ]

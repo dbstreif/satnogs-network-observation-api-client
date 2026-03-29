@@ -1,6 +1,5 @@
 """Shared test fixtures."""
 
-import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -9,86 +8,105 @@ from satnogs_network_api import SatnogsNetworkClient
 
 
 SAMPLE_OBSERVATION = {
-    "id": 1001,
-    "start": "2026-03-01T12:00:00Z",
-    "end": "2026-03-01T12:10:00Z",
-    "ground_station": 42,
-    "sat_id": "XXXX-YYYY-ZZZZ",
+    "id": 13687665,
+    "start": "2026-03-29T19:08:44Z",
+    "end": "2026-03-29T19:17:16Z",
+    "ground_station": 4680,
+    "transmitter": "qW5N27QuSrN2JMasbNiUhR",
     "norad_cat_id": 25544,
-    "status": "good",
-    "transmitter_uuid": "abc123",
-    "transmitter_description": "UHF 9k6 AFSK Telemetry",
-    "transmitter_type": "Transmitter",
-    "transmitter_mode": "AFSK",
-    "transmitter_downlink_low": 437000000,
-    "transmitter_downlink_high": None,
-    "transmitter_baud": 9600.0,
-    "center_frequency": 437000000,
-    "station_name": "Test Station",
-    "station_lat": 40.0,
-    "station_lng": -74.0,
-    "station_alt": 50,
-    "waterfall": "https://network.satnogs.org/media/waterfall.png",
-    "waterfall_status": True,
-    "payload": "https://network.satnogs.org/media/audio.ogg",
-    "archived": False,
-    "author": "testuser",
+    "payload": "https://network-satnogs.freetls.fastly.net/media/data_obs/2026/3/29/19/13687665/satnogs_13687665.ogg",
+    "waterfall": "https://s3.eu-central-1.wasabisys.com/satnogs-network/data_obs/2026/3/29/19/13687665/waterfall.png",
     "demoddata": [
         {
-            "id": 500,
-            "observation": 1001,
-            "payload_demod": "https://network.satnogs.org/media/demod.raw",
-            "is_image": False,
+            "payload_demod": "https://s3.eu-central-1.wasabisys.com/satnogs-network/data_obs/2026/3/29/19/13687665/data.png",
         }
     ],
+    "station_name": "MAJESAT",
+    "station_lat": 36.717165,
+    "station_lng": -4.464836,
+    "station_alt": 95,
+    "vetted_status": "good",
+    "vetted_user": None,
+    "vetted_datetime": None,
+    "archived": False,
+    "archive_url": None,
+    "client_version": "1.8.1",
+    "client_metadata": "{}",
+    "status": "good",
+    "waterfall_status": "unknown",
+    "waterfall_status_user": None,
+    "waterfall_status_datetime": None,
+    "rise_azimuth": 317.0,
+    "set_azimuth": 118.0,
+    "max_altitude": 50.0,
+    "transmitter_uuid": "qW5N27QuSrN2JMasbNiUhR",
+    "transmitter_description": "Mode V Imaging",
+    "transmitter_type": "Transmitter",
+    "transmitter_uplink_low": None,
+    "transmitter_uplink_high": None,
+    "transmitter_uplink_drift": None,
+    "transmitter_downlink_low": 145800000,
+    "transmitter_downlink_high": None,
+    "transmitter_downlink_drift": None,
+    "transmitter_mode": "SSTV",
+    "transmitter_invert": False,
+    "transmitter_baud": 0.0,
+    "transmitter_updated": "2025-10-02T07:54:48.115415Z",
+    "transmitter_status": "active",
+    "transmitter_unconfirmed": False,
+    "tle0": "ISS",
+    "tle1": "1 25544U 98067A   26088.13267411  .00012260  00000-0  23326-3 0  9999",
+    "tle2": "2 25544  51.6344 336.2407 0006215 245.2164 114.8178 15.48624340559341",
+    "tle_source": "CalPoly",
+    "center_frequency": None,
+    "observer": "majesat",
+    "observation_frequency": 145800000,
+    "sat_id": "XSKZ-5603-1870-9019-3066",
 }
 
 SAMPLE_STATION = {
-    "id": 42,
-    "name": "Test Station",
-    "lat": 40.0,
-    "lng": -74.0,
-    "alt": 50,
-    "status": "online",
-    "client_version": "1.8.1",
-    "last_seen": "2026-03-29T10:00:00Z",
-    "created": "2020-01-01T00:00:00Z",
-    "is_available": True,
-    "testing": False,
-    "description": "A test ground station",
-    "observations": 1500,
-    "target_utilization": 80,
-    "antennas": [
+    "id": 26,
+    "name": "SV1IYO/A",
+    "altitude": 145,
+    "min_horizon": 15,
+    "lat": 38.395,
+    "lng": 21.828,
+    "qthlocator": "KM08vj",
+    "antenna": [
         {
-            "antenna_type": "yagi",
-            "antenna_type_name": "Yagi",
-            "frequency_ranges": [
-                {"min_frequency": 430000000, "max_frequency": 440000000}
-            ],
+            "frequency": 135000000,
+            "frequency_max": 148000000,
+            "band": "VHF",
+            "antenna_type": "turnstile",
+            "antenna_type_name": "Turnstile",
         }
     ],
+    "created": "2017-10-11T21:19:49Z",
+    "last_seen": "2026-03-29T21:15:34Z",
+    "status": "Online",
+    "observations": 33526,
+    "future_observations": 0,
+    "description": "",
+    "client_version": "2.1.1",
+    "target_utilization": 100,
+    "image": "https://network-satnogs.freetls.fastly.net/media/ground_stations/station.jpg",
+    "success_rate": 76,
+    "owner": "acinonyx",
 }
 
 SAMPLE_TRANSMITTER = {
-    "uuid": "abc123",
-    "description": "UHF 9k6 AFSK Telemetry",
-    "alive": True,
-    "type": "Transmitter",
-    "downlink_low": 437000000,
-    "downlink_high": None,
-    "mode": "AFSK",
-    "mode_id": 1,
-    "baud": 9600.0,
-    "sat_id": "XXXX-YYYY-ZZZZ",
-    "norad_cat_id": 25544,
-    "status": "active",
-    "updated": "2026-03-01T00:00:00Z",
-    "total_observations": 500,
-    "good_observations": 400,
-    "bad_observations": 50,
-    "unknown_observations": 50,
-    "future_observations": 0,
-    "success_rate": 80.0,
+    "uuid": "MZgyEeYrdJsLnHCt3je6Ed",
+    "stats": {
+        "total_count": 6,
+        "unknown_count": 0,
+        "future_count": 0,
+        "good_count": 0,
+        "bad_count": 6,
+        "unknown_rate": 0,
+        "future_rate": 0,
+        "success_rate": 0,
+        "bad_rate": 100,
+    },
 }
 
 
@@ -103,6 +121,7 @@ def mock_response(data, status_code=200):
     resp.status_code = status_code
     resp.json.return_value = data
     resp.raise_for_status.return_value = None
+    resp.headers = {}
     return resp
 
 
