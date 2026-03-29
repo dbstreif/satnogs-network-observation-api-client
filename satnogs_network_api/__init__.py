@@ -11,7 +11,7 @@ from satnogs_network_api.models import (
 )
 from satnogs_network_api.pagination import PageIterator
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "SatnogsNetworkClient",
