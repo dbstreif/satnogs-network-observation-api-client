@@ -4,14 +4,13 @@
 
 The main entry point. Creates an HTTP session and exposes resource attributes.
 
+All endpoints are read-only and publicly accessible. No authentication is required.
+
 ```python
 from satnogs_network_api import SatnogsNetworkClient
 
-# Default (public, https://network.satnogs.org)
+# Default (https://network.satnogs.org)
 client = SatnogsNetworkClient()
-
-# With authentication
-client = SatnogsNetworkClient(token="your-api-token")
 
 # Custom instance
 client = SatnogsNetworkClient(base_url="https://network-dev.satnogs.org")
@@ -268,9 +267,7 @@ All models are Pydantic `BaseModel` subclasses with `.to_dict()` and `.to_json()
 | `start` | `datetime` | Observation start time |
 | `end` | `datetime` | Observation end time |
 | `ground_station` | `int` | Ground station ID |
-| `sat_id` | `str` | SatNOGS satellite ID |
-| `norad_cat_id` | `int` | NORAD catalog ID |
-| `status` | `str` | Observation status |
+| `transmitter` | `str` | Short transmitter UUID |
 | `transmitter_uuid` | `str` | Transmitter UUID |
 | `transmitter_description` | `str` | Transmitter description |
 | `transmitter_type` | `str` | Transmitter type |
@@ -280,30 +277,45 @@ All models are Pydantic `BaseModel` subclasses with `.to_dict()` and `.to_json()
 | `transmitter_uplink_high` | `int` | Uplink high frequency (Hz) |
 | `transmitter_downlink_low` | `int` | Downlink low frequency (Hz) |
 | `transmitter_downlink_high` | `int` | Downlink high frequency (Hz) |
+| `transmitter_updated` | `datetime` | Transmitter last updated |
+| `transmitter_status` | `str` | Transmitter status (e.g. `active`) |
+| `transmitter_unconfirmed` | `bool` | Whether transmitter is unconfirmed |
 | `center_frequency` | `int` | Center frequency (Hz) |
+| `observation_frequency` | `int` | Observation frequency (Hz) |
+| `sat_id` | `str` | SatNOGS satellite ID |
+| `norad_cat_id` | `int` | NORAD catalog ID |
+| `tle0` | `str` | TLE line 0 (satellite name) |
+| `tle1` | `str` | TLE line 1 |
+| `tle2` | `str` | TLE line 2 |
+| `tle_source` | `str` | TLE source |
+| `observer` | `str` | Observer username |
+| `status` | `str` | Observation status (`good`, `bad`, `unknown`, `failed`, `future`) |
+| `vetted_status` | `str` | Vetted status |
+| `vetted_user` | `int` | Vetted by user ID |
+| `vetted_datetime` | `datetime` | Vetted timestamp |
+| `waterfall` | `str` | Waterfall image URL |
+| `waterfall_status` | `str` | Signal status (`unknown`, `with-signal`, `without-signal`) |
+| `waterfall_status_user` | `int` | Waterfall vetted by user ID |
+| `waterfall_status_datetime` | `datetime` | Waterfall vetted timestamp |
+| `payload` | `str` | Audio payload URL |
 | `station_name` | `str` | Station name |
 | `station_lat` | `float` | Station latitude |
 | `station_lng` | `float` | Station longitude |
 | `station_alt` | `int` | Station altitude (m) |
-| `waterfall` | `str` | Waterfall image URL |
-| `waterfall_status` | `bool` | Signal detected |
-| `payload` | `str` | Audio payload URL |
-| `archived` | `bool` | Whether archived |
-| `archive_url` | `str` | Archive.org URL |
-| `demoddata` | `list[DemodData]` | Demodulated data frames |
-| `author` | `str` | Observer username |
 | `rise_azimuth` | `float` | Rise azimuth (degrees) |
 | `max_altitude` | `float` | Max altitude (degrees) |
 | `set_azimuth` | `float` | Set azimuth (degrees) |
+| `archived` | `bool` | Whether archived |
+| `archive_url` | `str` | Archive.org URL |
+| `demoddata` | `list[DemodData]` | Demodulated data frames |
+| `client_version` | `str` | Client software version |
+| `client_metadata` | `str` | Client metadata JSON string |
 
 ### DemodData
 
 | Field | Type | Description |
 |---|---|---|
-| `id` | `int` | Demod data ID |
-| `observation` | `int` | Parent observation ID |
 | `payload_demod` | `str` | URL to demodulated data file |
-| `is_image` | `bool` | Whether the frame is an image |
 
 #### `demoddata.download(session=None)`
 
@@ -369,55 +381,51 @@ for frame in obs.demoddata:
 |---|---|---|
 | `id` | `int` | Station ID |
 | `name` | `str` | Station name |
+| `altitude` | `int` | Altitude (m) |
+| `min_horizon` | `int` | Minimum horizon (degrees) |
 | `lat` | `float` | Latitude |
 | `lng` | `float` | Longitude |
-| `alt` | `int` | Altitude (m) |
-| `status` | `str` | Station status |
-| `client_version` | `str` | Client software version |
-| `last_seen` | `datetime` | Last heartbeat time |
-| `created` | `datetime` | Station creation time |
-| `is_available` | `bool` | Whether available for scheduling |
-| `testing` | `bool` | Whether in testing mode |
-| `description` | `str` | Station description |
-| `antennas` | `list[Antenna]` | Antenna configurations |
-| `observations` | `int` | Total observation count |
-| `target_utilization` | `int` | Target utilization percentage |
 | `qthlocator` | `str` | QTH Maidenhead locator |
+| `antenna` | `list[AntennaEntry]` | Antenna configurations |
+| `created` | `datetime` | Station creation time |
+| `last_seen` | `datetime` | Last heartbeat time |
+| `status` | `str` | Station status (`Online`, `Testing`, `Offline`) |
+| `observations` | `int` | Total observation count |
+| `future_observations` | `int` | Future observation count |
+| `description` | `str` | Station description |
+| `client_version` | `str` | Client software version |
+| `target_utilization` | `int` | Target utilization percentage |
+| `image` | `str` | Station image URL |
+| `success_rate` | `float` | Observation success rate |
+| `owner` | `str` | Station owner username |
 
 ### Transmitter
 
 | Field | Type | Description |
 |---|---|---|
 | `uuid` | `str` | Transmitter UUID |
-| `description` | `str` | Description |
-| `alive` | `bool` | Whether active |
-| `type` | `str` | Transmitter type |
-| `uplink_low` | `int` | Uplink low frequency (Hz) |
-| `uplink_high` | `int` | Uplink high frequency (Hz) |
-| `downlink_low` | `int` | Downlink low frequency (Hz) |
-| `downlink_high` | `int` | Downlink high frequency (Hz) |
-| `mode` | `str` | Transmission mode |
-| `baud` | `float` | Baud rate |
-| `sat_id` | `str` | Satellite ID |
-| `norad_cat_id` | `int` | NORAD catalog ID |
-| `status` | `str` | Transmitter status |
-| `service` | `str` | Service category |
-| `total_observations` | `int` | Total observations |
-| `good_observations` | `int` | Good observations |
-| `bad_observations` | `int` | Bad observations |
-| `success_rate` | `float` | Success rate percentage |
+| `stats` | `TransmitterStats` | Observation statistics |
 
-### Antenna
+### TransmitterStats
 
 | Field | Type | Description |
 |---|---|---|
+| `total_count` | `int` | Total observations |
+| `unknown_count` | `int` | Unknown observations |
+| `future_count` | `int` | Future observations |
+| `good_count` | `int` | Good observations |
+| `bad_count` | `int` | Bad observations |
+| `unknown_rate` | `float` | Unknown rate (%) |
+| `future_rate` | `float` | Future rate (%) |
+| `success_rate` | `float` | Success rate (%) |
+| `bad_rate` | `float` | Bad rate (%) |
+
+### AntennaEntry
+
+| Field | Type | Description |
+|---|---|---|
+| `frequency` | `int` | Min frequency (Hz) |
+| `frequency_max` | `int` | Max frequency (Hz) |
+| `band` | `str` | Band name (e.g. `VHF`, `UHF`) |
 | `antenna_type` | `str` | Antenna type identifier |
 | `antenna_type_name` | `str` | Antenna type name |
-| `frequency_ranges` | `list[FrequencyRange]` | Supported frequency ranges |
-
-### FrequencyRange
-
-| Field | Type | Description |
-|---|---|---|
-| `min_frequency` | `int` | Minimum frequency (Hz) |
-| `max_frequency` | `int` | Maximum frequency (Hz) |
