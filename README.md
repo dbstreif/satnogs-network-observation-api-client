@@ -50,6 +50,10 @@ for obs in client.observations.list(status="good", norad_cat_id=25544):
 
 See [API.md](API.md) for complete documentation of all wrapper functions with usage examples.
 
+## AI Transparency
+
+This project was built with the assistance of Claude (Anthropic). AI was used for code generation, documentation, and test authoring. All AI-assisted commits are tagged with a `Co-Authored-By` trailer in the commit message. A human reviewed and directed all changes.
+
 ## License
 
 AGPL-3.0
