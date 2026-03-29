@@ -22,7 +22,16 @@ class TestClientInit:
             c = SatnogsNetworkClient(base_url="https://example.com///")
             assert c._base_url == "https://example.com"
 
-    def test_no_auth_header(self, client):
+    def test_token_sets_auth_header(self):
+        with patch("satnogs_network_api.client.requests.Session") as mock_cls:
+            headers = {}
+            mock_session = MagicMock()
+            mock_session.headers = headers
+            mock_cls.return_value = mock_session
+            SatnogsNetworkClient(token="mytoken123")
+            assert headers["Authorization"] == "Token mytoken123"
+
+    def test_no_token_no_auth_header(self, client):
         assert "Authorization" not in client._mock_session.headers
 
     def test_accept_json_header(self, client):

@@ -1,5 +1,6 @@
 """API resource classes for SatNOGS Network endpoints."""
 
+import time
 from datetime import datetime
 from typing import Any, Dict, Optional, Union
 
@@ -16,6 +17,17 @@ def _format_param(value: Any) -> Any:
     if isinstance(value, bool):
         return str(value).lower()
     return value
+
+
+def _get_with_retry(session: requests.Session, url: str) -> requests.Response:
+    """GET with a single retry on 429 Too Many Requests."""
+    response = session.get(url)
+    if response.status_code == 429:
+        retry_after = int(response.headers.get("Retry-After", 60))
+        time.sleep(retry_after)
+        response = session.get(url)
+    response.raise_for_status()
+    return response
 
 
 def _build_params(**kwargs: Any) -> Dict[str, Any]:
@@ -105,8 +117,7 @@ class Observations:
             An Observation instance.
         """
         url = f"{self._base_url}{observation_id}/"
-        response = self._session.get(url)
-        response.raise_for_status()
+        response = _get_with_retry(self._session, url)
         return Observation.model_validate(response.json())
 
 
@@ -162,8 +173,7 @@ class Stations:
             A Station instance.
         """
         url = f"{self._base_url}{station_id}/"
-        response = self._session.get(url)
-        response.raise_for_status()
+        response = _get_with_retry(self._session, url)
         return Station.model_validate(response.json())
 
 
@@ -200,6 +210,5 @@ class Transmitters:
             A Transmitter instance.
         """
         url = f"{self._base_url}{uuid}"
-        response = self._session.get(url)
-        response.raise_for_status()
+        response = _get_with_retry(self._session, url)
         return Transmitter.model_validate(response.json())

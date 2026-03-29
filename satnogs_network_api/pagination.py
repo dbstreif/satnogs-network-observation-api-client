@@ -1,6 +1,7 @@
 """Lazy cursor-based pagination for the SatNOGS Network API."""
 
 import re
+import time
 from typing import Any, Dict, Iterator, List, Optional, Type, TypeVar
 
 import requests
@@ -60,6 +61,10 @@ class PageIterator(Iterator[T]):
             return
 
         response = self._session.get(self._next_url, params=self._next_params)
+        if response.status_code == 429:
+            retry_after = int(response.headers.get("Retry-After", 60))
+            time.sleep(retry_after)
+            response = self._session.get(self._next_url, params=self._next_params)
         response.raise_for_status()
         data = response.json()
 

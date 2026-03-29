@@ -4,13 +4,18 @@
 
 The main entry point. Creates an HTTP session and exposes resource attributes.
 
-All endpoints are read-only and publicly accessible. No authentication is required.
+All endpoints are read-only and publicly accessible. Authentication is optional but increases the observation rate limit from 60 to 240 requests/hour.
+
+The client automatically retries once on 429 (Too Many Requests), respecting the `Retry-After` header.
 
 ```python
 from satnogs_network_api import SatnogsNetworkClient
 
-# Default (https://network.satnogs.org)
+# Anonymous (60 observations requests/hour)
 client = SatnogsNetworkClient()
+
+# Authenticated (240 observations requests/hour)
+client = SatnogsNetworkClient(token="your-api-token")
 
 # Custom instance
 client = SatnogsNetworkClient(base_url="https://network-dev.satnogs.org")
@@ -19,6 +24,14 @@ client = SatnogsNetworkClient(base_url="https://network-dev.satnogs.org")
 with SatnogsNetworkClient() as client:
     obs = client.observations.get(12345)
 ```
+
+### Rate Limits
+
+| Endpoint | Anonymous | Authenticated |
+|---|---|---|
+| Observations | 60/hour | 240/hour |
+| Stations | 256/hour | — |
+| Transmitters | No known limit | — |
 
 ### Attributes
 
