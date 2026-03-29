@@ -305,6 +305,64 @@ All models are Pydantic `BaseModel` subclasses with `.to_dict()` and `.to_json()
 | `payload_demod` | `str` | URL to demodulated data file |
 | `is_image` | `bool` | Whether the frame is an image |
 
+#### `demoddata.download(session=None)`
+
+Download the raw demodulated data as bytes.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `session` | `requests.Session` | Optional session (uses the client's session for auth, or a plain GET if omitted) |
+
+**Returns:** `bytes`
+
+**Example:**
+
+```python
+obs = client.observations.get(12345)
+for frame in obs.demoddata:
+    raw_bytes = frame.download(session=client._session)
+    print(len(raw_bytes), "bytes")
+```
+
+#### `demoddata.display_payload_hex(session=None)`
+
+Download and return the frame as a pretty hex string (e.g. `DE AD C0 DE`).
+
+| Parameter | Type | Description |
+|---|---|---|
+| `session` | `requests.Session` | Optional session |
+
+**Returns:** `str`
+
+**Example:**
+
+```python
+obs = client.observations.get(12345)
+for frame in obs.demoddata:
+    print(frame.display_payload_hex(session=client._session))
+    # Output: DE AD BE EF 01 02 03 ...
+```
+
+#### `demoddata.display_payload_utf8(session=None)`
+
+Download and return the frame decoded as UTF-8. Falls back to pretty hex if UTF-8 decoding fails.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `session` | `requests.Session` | Optional session |
+
+**Returns:** `str`
+
+**Example:**
+
+```python
+obs = client.observations.get(12345)
+for frame in obs.demoddata:
+    text = frame.display_payload_utf8(session=client._session)
+    print(text)
+    # Output: readable text if UTF-8, or "DE AD C0 DE" hex fallback
+```
+
 ### Station
 
 | Field | Type | Description |

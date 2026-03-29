@@ -1,9 +1,17 @@
 """Pydantic models for SatNOGS Network API responses."""
 
+import codecs
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+import requests as _requests
 from pydantic import BaseModel, ConfigDict, Field
+
+
+def _decode_pretty_hex(binary_data: bytes) -> str:
+    """Return binary data as hex dump: ``DE AD C0 DE``."""
+    data = codecs.encode(binary_data, "hex").decode("ascii").upper()
+    return " ".join(data[i : i + 2] for i in range(0, len(data), 2))
 
 
 class DemodData(BaseModel):
@@ -13,6 +21,63 @@ class DemodData(BaseModel):
     observation: int
     payload_demod: Optional[str] = Field(None, description="URL to demodulated data file")
     is_image: bool = False
+
+    def download(self, session: Optional[_requests.Session] = None) -> bytes:
+        """Download the raw demodulated data as bytes.
+
+        Args:
+            session: Optional requests session. If not provided, a plain
+                GET request is made.
+
+        Returns:
+            Raw bytes of the demodulated frame.
+
+        Raises:
+            ValueError: If no payload_demod URL is available.
+            requests.HTTPError: If the download fails.
+        """
+        if not self.payload_demod:
+            raise ValueError("No payload_demod URL available for this frame")
+        if session:
+            resp = session.get(self.payload_demod)
+        else:
+            resp = _requests.get(self.payload_demod)
+        resp.raise_for_status()
+        return resp.content
+
+    def display_payload_hex(
+        self, session: Optional[_requests.Session] = None
+    ) -> str:
+        """Download and return the frame as a pretty hex string.
+
+        Returns format: ``DE AD C0 DE``
+
+        Args:
+            session: Optional requests session.
+
+        Returns:
+            Space-separated uppercase hex representation of the frame.
+        """
+        return _decode_pretty_hex(self.download(session))
+
+    def display_payload_utf8(
+        self, session: Optional[_requests.Session] = None
+    ) -> str:
+        """Download and return the frame decoded as UTF-8.
+
+        Falls back to pretty hex if UTF-8 decoding fails.
+
+        Args:
+            session: Optional requests session.
+
+        Returns:
+            UTF-8 decoded string, or hex dump on decode failure.
+        """
+        payload = self.download(session)
+        try:
+            return payload.decode("utf-8")
+        except UnicodeDecodeError:
+            return _decode_pretty_hex(payload)
 
     def to_dict(self) -> Dict[str, Any]:
         return self.model_dump()

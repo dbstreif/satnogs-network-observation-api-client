@@ -1,6 +1,9 @@
 """Tests for pydantic models."""
 
 from datetime import datetime
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from satnogs_network_api.models import (
     Antenna,
@@ -62,6 +65,66 @@ class TestDemodData:
         assert dd.observation == 1001
         assert dd.is_image is False
         assert "demod.raw" in dd.payload_demod
+
+    def test_download(self):
+        dd = DemodData.model_validate(SAMPLE_OBSERVATION["demoddata"][0])
+        mock_session = MagicMock()
+        mock_resp = MagicMock()
+        mock_resp.content = b"\xDE\xAD\xC0\xDE"
+        mock_resp.raise_for_status.return_value = None
+        mock_session.get.return_value = mock_resp
+
+        result = dd.download(session=mock_session)
+        assert result == b"\xDE\xAD\xC0\xDE"
+        mock_session.get.assert_called_once_with(dd.payload_demod)
+
+    def test_download_no_url_raises(self):
+        dd = DemodData.model_validate({"id": 1, "observation": 1})
+        with pytest.raises(ValueError, match="No payload_demod URL"):
+            dd.download()
+
+    def test_download_no_session(self):
+        dd = DemodData.model_validate(SAMPLE_OBSERVATION["demoddata"][0])
+        mock_resp = MagicMock()
+        mock_resp.content = b"\x01\x02"
+        mock_resp.raise_for_status.return_value = None
+        with patch("satnogs_network_api.models._requests.get", return_value=mock_resp) as mock_get:
+            result = dd.download()
+            assert result == b"\x01\x02"
+            mock_get.assert_called_once_with(dd.payload_demod)
+
+    def test_display_payload_hex(self):
+        dd = DemodData.model_validate(SAMPLE_OBSERVATION["demoddata"][0])
+        mock_session = MagicMock()
+        mock_resp = MagicMock()
+        mock_resp.content = b"\xDE\xAD\xC0\xDE"
+        mock_resp.raise_for_status.return_value = None
+        mock_session.get.return_value = mock_resp
+
+        result = dd.display_payload_hex(session=mock_session)
+        assert result == "DE AD C0 DE"
+
+    def test_display_payload_utf8_success(self):
+        dd = DemodData.model_validate(SAMPLE_OBSERVATION["demoddata"][0])
+        mock_session = MagicMock()
+        mock_resp = MagicMock()
+        mock_resp.content = b"Hello, World!"
+        mock_resp.raise_for_status.return_value = None
+        mock_session.get.return_value = mock_resp
+
+        result = dd.display_payload_utf8(session=mock_session)
+        assert result == "Hello, World!"
+
+    def test_display_payload_utf8_fallback_to_hex(self):
+        dd = DemodData.model_validate(SAMPLE_OBSERVATION["demoddata"][0])
+        mock_session = MagicMock()
+        mock_resp = MagicMock()
+        mock_resp.content = b"\xDE\xAD\xC0\xDE"
+        mock_resp.raise_for_status.return_value = None
+        mock_session.get.return_value = mock_resp
+
+        result = dd.display_payload_utf8(session=mock_session)
+        assert result == "DE AD C0 DE"
 
 
 class TestStation:
